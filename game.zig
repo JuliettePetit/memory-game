@@ -9,13 +9,16 @@ var Game = struct {
     c:i32,
     cards: []const Card,
 };
-
-var prng = std.rand.DefaultPrng.init(blk: {
+fn setRequired()void{
+    var prng = std.rand.DefaultPrng.init(blk: {
         var seed: u64 = undefined;
         try std.posix.getrandom(std.mem.asBytes(&seed));
         break :blk seed;
     });
-    const rand = prng.random();
+    return prng.random();
+}
+const rand = setRequired();
+
 
 fn initCards(nb:i32) []Card{
     //var avail_colors = nb;
@@ -37,27 +40,40 @@ fn initCards(nb:i32) []Card{
     var d : i32 = 0;
     while (i<nb) : (i+=1){
         while (avail_colors[d]==0){
-            d = rand.intRangeAtMost(u8, 0, nb_colors); 
+            d = rand.intRangeAtMost(u8, 0, nb_colors);
         }
         cards[i]=Card{
             .color = avail_colors[d],
         };
     }
     defer allocator.free(avail_colors);
+    return cards;
 }
 fn arrayTo2d (i:i32, c:i32) struct {x:32, y:i32}{
     return .{.x=i/c,.y=@mod(i, c)};
 }
-fn init(l:i32, c: i32) u32{
+fn init() Game{
     const g = Game{
-            .l = 0,
-            .c = 100,
-            .cards = 50,
-        };
-    initCards(50);
+        .l = 0,
+        .c = 100,
+        .cards = initCards(50),
+    };
+    return g;
 }
 
-fn gameEnd():bool
-{
+fn playGame() void{
+    const g = init();
+    while(gameEnd(g)){
 
+    }
+}
+
+fn gameEnd(g: Game) bool
+{
+    for (g.cards) |card| {
+        if(card.hidden){
+            return false;
+        }
+    }
+    return true;
 }
