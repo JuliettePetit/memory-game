@@ -19,6 +19,10 @@ fn setRequired()void{
 }
 const rand = setRequired();
 
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+defer std.debug.assert(!gpa.deinit());
+const allocator = &gpa.allocator;
+
 
 fn initCards(nb:i32) []Card{
     //var avail_colors = nb;
@@ -28,10 +32,7 @@ fn initCards(nb:i32) []Card{
     while (i<nb) : (i+=1){
         nb_colors[i]=0;
     }
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer std.debug.assert(!gpa.deinit());
-    const allocator = &gpa.allocator;
-    var avail_colors:[]i32=try allocator.alloc(i32, nb_colors);
+        var avail_colors:[]i32=try allocator.alloc(i32, nb_colors);
     while (i<nb_colors) : (i +=1){
             avail_colors[i]=2;
         }
@@ -52,17 +53,24 @@ fn initCards(nb:i32) []Card{
 fn arrayTo2d (i:i32, c:i32) struct {x:32, y:i32}{
     return .{.x=i/c,.y=@mod(i, c)};
 }
-fn init() Game{
-    const g = Game{
+fn init(nb:i32) Game{
+    const g:Game = {
         .l = 0,
         .c = 100,
-        .cards = initCards(50),
+        .cards = initCards(nb),
     };
     return g;
 }
 
+fn playRound(c1:Card, c2:Card)void{
+    if(c1.color == c2.color){
+        c1.hidden = False;
+        c2.hidden = false;
+    }
+}
+
 fn playGame() void{
-    const g = init();
+    const g = init(50);
     while(gameEnd(g)){
 
     }
@@ -76,4 +84,16 @@ fn gameEnd(g: Game) bool
         }
     }
     return true;
+}
+
+fn getCardColor(card:Card)i32{
+    return card.color;
+}
+
+fn isCardHidden(card:Card)bool{
+    return card.hidden;
+}
+
+fn delete(g:Game) void{
+
 }
