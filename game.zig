@@ -2,7 +2,8 @@ const std = @import("std");
 
 const Game = struct {
     cards: []u32,
-    first_pick: ?usize = null, // index of first flipped card this turn
+    hidden: []bool,
+    first_pick: ?usize = null,
     pairs_found: usize = 0,
 };
 
@@ -21,13 +22,11 @@ fn initCards(nb: usize) ![]u32 {
     const nb_colors = nb / 2;
 
     var avail_colors: []usize = try allocator.alloc(usize, nb_colors);
-    var i: usize = 0;
-    while (i < nb_colors) : (i += 1) {
-        avail_colors[i] = 2;
-    }
+    defer allocator.free(avail_colors);
+    @memset(avail_colors, 2);
 
     var cards: []u32 = try allocator.alloc(u32, nb);
-    i = 0;
+    var i: usize = 0;
     while (i < nb) : (i += 1) {
         var d: usize = prng.random().intRangeLessThan(usize, 0, nb_colors);
         while (avail_colors[d] == 0) {
@@ -36,12 +35,15 @@ fn initCards(nb: usize) ![]u32 {
         cards[i] = @intCast(d);
         avail_colors[d] -= 1;
     }
-    defer allocator.free(avail_colors);
     return cards;
 }
 
 export fn getCards(g: *Game) [*]u32 {
     return g.cards.ptr;
+}
+
+export fn getHiddenCards(g: *Game) [*]bool {
+    return g.hidden.ptr;
 }
 
 export fn init(nb: usize) ?*Game {
@@ -51,22 +53,34 @@ export fn init(nb: usize) ?*Game {
             allocator.destroy(g);
             return null;
         },
+        .hidden = allocator.alloc(bool, nb) catch {
+            allocator.destroy(g);
+            return null;
+        },
     };
+    @memset(g.hidden, true);
     return g;
 }
 
-fn playRound(c1: u32, c2: (u32)) void {
-    if (c1.color == c2.color) {
-        c1.hidden = false;
-        c2.hidden = false;
-    }
+export fn selectCard(g: *Game, index: usize) bool {
+    if (g.first_pick != null) {
+        const matched = flipCardIfMatching(g, index);
+        if (matched) g.pairs_found += 1;
+        g.first_pick = null;
+        return matched;
+    } else g.first_pick = index;
+    return true;
 }
 
-//export fn selectCard(g: *Game, index: usize) bool {}
-
-//fn flipCard(g: *Game, index: usize) void {}
-
-//export fn resetUnmatched(g: *Game) void {}
+fn flipCardIfMatching(g: *Game, index: usize) bool {
+    const first = g.first_pick.?;
+    if (g.cards[index] == g.cards[first]) {
+        g.hidden[index] = false;
+        g.hidden[first] = false;
+        return true;
+    }
+    return false;
+}
 
 fn gameEnd(g: *Game) bool {
     for (g.cards) |card| {
@@ -83,10 +97,6 @@ fn getCardsNumber(g: *Game) usize {
 
 fn getCardColor(card: u32) i32 {
     return card.color;
-}
-
-fn isCardHidden(card: u32) bool {
-    return card.hidden;
 }
 
 export fn delete(g: *Game) void {
