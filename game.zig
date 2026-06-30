@@ -62,14 +62,17 @@ export fn init(nb: usize) ?*Game {
     return g;
 }
 
-export fn selectCard(g: *Game, index: usize) bool {
+/// 0 = no match
+/// 1 = single
+/// 2 = match
+export fn selectCard(g: *Game, index: usize) i32 {
     if (g.first_pick != null) {
         const matched = flipCardIfMatching(g, index);
         if (matched) g.pairs_found += 1;
         g.first_pick = null;
-        return matched;
+        return if (matched) 2 else 0;
     } else g.first_pick = index;
-    return true;
+    return 1;
 }
 
 fn flipCardIfMatching(g: *Game, index: usize) bool {

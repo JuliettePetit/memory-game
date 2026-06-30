@@ -32,6 +32,7 @@ WebAssembly.instantiateStreaming(
   let cardsPtr = null;
   const cols = 4;
   const rows = 4;
+  let locked = false;
 
   const displayCard = (i, color) => {
     img = document.getElementById(`card-${i}`);
@@ -50,12 +51,17 @@ WebAssembly.instantiateStreaming(
   };
 
   const onCardClick = (index, color) => {
-    match = wasm.selectCard(gamePtr, index);
+    if (locked) return;
+    const result = wasm.selectCard(gamePtr, index);
 
     displayCard(index, color);
 
-    if (!match) {
-      setTimeout(() => hideCards(), 1000);
+    if (result === 0) {
+      locked = true;
+      setTimeout(() => {
+        hideCards();
+        locked = false;
+      }, 1000);
     }
   };
 
