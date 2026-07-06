@@ -35,7 +35,7 @@ WebAssembly.instantiateStreaming(
   let locked = false;
 
   const displayCard = (i, color) => {
-    img = document.getElementById(`card-${i}`);
+    const img = document.getElementById(`card-${i}`);
     img.src = `res/img/${colorNames[color]}.png`;
   };
 
@@ -43,11 +43,35 @@ WebAssembly.instantiateStreaming(
     const hiddenPtr = wasm.getHiddenCards(gamePtr);
     const hiddenMem = new Uint8Array(wasm.memory.buffer);
     for (let i = 0; i < cols * rows; i++) {
-      if (hiddenMem[hiddenPtr + i] === 1) {
+      if (hiddenMem[hiddenPtr + i] !== 0) {
         const img = document.getElementById(`card-${i}`);
         img.src = "res/img/hidden.jpg";
       }
     }
+  };
+
+  let startTime = null;
+  let timerInterval = null;
+
+  const startTimer = () => {
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      //document.getElementById("timer").textContent = `${elapsed}s`;
+    }, 1000);
+  };
+
+  const stopTimer = () => {
+    clearInterval(timerInterval);
+    return Math.floor((Date.now() - startTime) / 1000);
+  };
+
+  const showWinScreen = () => {
+    const elapsed = stopTimer();
+    console.log("elapsed", elapsed);
+    document.getElementById("win-text").textContent =
+      `you cleared the board in ${elapsed} second`;
+    document.getElementById("win-screen-wrapper").style.display = "flex";
   };
 
   const onCardClick = (index, color) => {
@@ -55,6 +79,10 @@ WebAssembly.instantiateStreaming(
     const result = wasm.selectCard(gamePtr, index);
 
     displayCard(index, color);
+
+    if (result === 2 && wasm.gameEnd(gamePtr)) {
+      showWinScreen();
+    }
 
     if (result === 0) {
       locked = true;
@@ -72,14 +100,15 @@ WebAssembly.instantiateStreaming(
 
     const baseIndex = cardsPtr / 4;
 
+    const existing = document.getElementById("cardGrid");
+    if (existing) existing.remove();
     const container = document.createElement("div");
     container.id = "cardGrid";
     container.classList.add("container");
-    document.body.appendChild(container);
+    document.getElementById("game-layout").appendChild(container);
 
     for (let i = 0; i < cols * rows; i++) {
       const color = mem[baseIndex + i];
-      console.log(cardsPtr, color);
 
       const div = document.createElement("div");
       container.appendChild(div);
@@ -91,6 +120,7 @@ WebAssembly.instantiateStreaming(
       img.addEventListener("click", () => onCardClick(i, color));
       div.appendChild(img);
     }
+    startTimer();
   };
 
   drawBoard();

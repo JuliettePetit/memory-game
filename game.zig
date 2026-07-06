@@ -67,6 +67,8 @@ export fn init(nb: usize) ?*Game {
 /// 2 = match
 export fn selectCard(g: *Game, index: usize) i32 {
     if (g.first_pick != null) {
+        if (g.first_pick == index)
+            return 1;
         const matched = flipCardIfMatching(g, index);
         if (matched) g.pairs_found += 1;
         g.first_pick = null;
@@ -85,21 +87,19 @@ fn flipCardIfMatching(g: *Game, index: usize) bool {
     return false;
 }
 
-fn gameEnd(g: *Game) bool {
-    for (g.cards) |card| {
-        if (card.hidden) {
+export fn gameEnd(g: *Game) bool {
+    var i: usize = 0;
+    while (i < g.hidden.len) {
+        if (g.hidden[i]) {
             return false;
         }
+        i += 1;
     }
     return true;
 }
 
 fn getCardsNumber(g: *Game) usize {
     return g.cards.len;
-}
-
-fn getCardColor(card: u32) i32 {
-    return card.color;
 }
 
 export fn delete(g: *Game) void {
