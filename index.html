@@ -3,7 +3,9 @@
     <head>
         <meta charset="utf-8" />
         <title>Minimal zig-wasm</title>
-        <script src="script.js"></script>
+        <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>s
+        <script src="game.js"></script>
+        <script type="module" src="pointer.js"></script>
     </head>
     <body>
         <div id="game-layout"></div>
@@ -15,25 +17,34 @@
         </div>
         <div id="time-layout"></div>
         <div id="chat-layout"></div>
-        <div id="persona-layout"></div>
+        <div id="persona-layout">
+            <model-viewer src="res/model/lowpoly.glb" camera-controls
+              auto-rotate
+              rotation-per-second="50deg"
+              min-camera-orbit="auto 60deg 3.5m"
+              max-camera-orbit="auto 75deg 5m"></model-viewer>
+        </div>
+        <canvas></canvas>
     </body>
 </html>
 
 <style>
     html {
         background-color: black;
+        cursor: none;
     }
     body {
         display: flex;
         justify-content: space-between;
         align-items: center;
         min-height: 100vh;
-        margin: 0 20px;
+        width: 100%;
+        margin: 0px;
     }
 
     #game-layout {
         justify-content: center; /* horizontal */
-        background-image: url("res/layout/gamelayout.png");
+        background-image: url("res/img/layout/gamelayout.png");
         background-repeat: no-repeat;
         background-size: contain;
         width: 600px;
@@ -99,21 +110,43 @@
     }
 
     #time-layout {
-        background-image: url("res/layout/timelayout.png");
+        background-image: url("res/img/layout/timelayout.png");
         background-repeat: no-repeat;
         background-size: contain;
         width: 300px;
         height: 300px;
         padding: 20px;
-        padding-top: 30;
+        padding-top: 30px
     }
 
     #persona-layout {
+        box-sizing: border-box;
+        display: flex;
         justify-content: center;
-        background-image: url("res/layout/personalayout.png");
+        background-image: url("res/img/layout/personalayout.png");
         background-repeat: no-repeat;
         background-size: contain;
-        width: 310px;
-        height: 570px;
+        width: 100%;
+        max-width: 380px;
+        aspect-ratio: 910 / 1760;
+        height: auto;
+        padding: 12px;
+        padding-top: 68px;
     }
+
+    model-viewer {
+        flex: 1;
+        width: 100%;
+        height: auto
+    }
+      canvas {
+        pointer-events: none;
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        will-change: transform;
+        transform: translateZ(0); // ?
+        z-index: 99999;
+      }
 </style>
