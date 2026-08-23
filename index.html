@@ -3,7 +3,10 @@
     <head>
         <meta charset="utf-8" />
         <title>Minimal zig-wasm</title>
-        <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>s
+        <script
+            type="module"
+            src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"
+        ></script>
         <script src="game.js"></script>
         <script type="module" src="pointer.js"></script>
     </head>
@@ -18,13 +21,16 @@
         <div id="time-layout"></div>
         <div id="chat-layout"></div>
         <div id="persona-layout">
-            <model-viewer src="res/model/lowpoly.glb" camera-controls
-              auto-rotate
-              rotation-per-second="50deg"
-              min-camera-orbit="auto 60deg 3.5m"
-              max-camera-orbit="auto 75deg 5m"></model-viewer>
+            <model-viewer
+                src="res/model/lowpoly.glb"
+                camera-controls
+                auto-rotate
+                rotation-per-second="50deg"
+                min-camera-orbit="auto 60deg 3.5m"
+                max-camera-orbit="auto 75deg 5m"
+            ></model-viewer>
         </div>
-        <canvas></canvas>
+        <canvas id="pointer-canvas"></canvas>
     </body>
 </html>
 
@@ -139,14 +145,15 @@
         width: 100%;
         height: auto
     }
-      canvas {
-        pointer-events: none;
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        will-change: transform;
-        transform: translateZ(0); // ?
-        z-index: 99999;
-      }
+
+    #pointer-canvas {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    will-change: transform;
+    transform: translateZ(0); // ?
+    z-index: 99999;
+    }
 </style>
