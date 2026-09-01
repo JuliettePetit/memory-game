@@ -8,7 +8,7 @@ fn vs_main(input: VertexInput) -> @builtin(position) vec4<f32> {
 }
 
 struct Uniforms {
-    cursors_pos: array<vec4f, 2>,
+    cursors_pos: array<vec4f, 4>,
     resolution: vec2f,   // canvas.width, canvas.height in pixels
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
@@ -37,7 +37,7 @@ fn fragmentMain(@builtin(position) fragCoord: vec4f) -> @location(0) vec4f {
             u.cursors_pos[i].zw.y
         ) * u.resolution;
         let p = fragCoord.xy; // current pixel
-        let radius = 15.0;
+        let radius = 10.0;
         let d1 = dot(p - center1, p - center1); //dot(v, v) is identical to |v|² (the squared length)
         let d2 = dot(p - center2, p - center2);
         let r2 = radius * radius;
@@ -46,7 +46,7 @@ fn fragmentMain(@builtin(position) fragCoord: vec4f) -> @location(0) vec4f {
         total_influence += influence1 + influence2;
     }
     let threshold = 1.0;
-    let softness = 0.1;
+    let softness = 0.99;
     let alpha = smoothstep(threshold - softness, threshold + softness, total_influence);
     let rgb = vec3f(1, 0, 0.4) * (alpha); // premultiply manually
     return vec4f(rgb, alpha);
