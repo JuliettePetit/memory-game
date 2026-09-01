@@ -27,28 +27,31 @@ context.configure({
 });
 
 /* create the uniform buffer that correspond */
-const TRAIL_LENGTH = 4;
+const TRAIL_LENGTH = 8;
 const uniformBuffer = device.createBuffer({
   label: "pointer position",
-  size: 48, // 32 (2×vec4f) + 8 (vec2f) padded up to nearest multiple of 16
+  size: 80, // 64 (4×vec4f) + 8 (vec2f) = 72, padded up to nearest multiple of 16
   usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
 });
 
 /* get pointer position & create trail positions */
 let trail = Array.from({ length: TRAIL_LENGTH }, () => [0.5, 0.5]);
+let pointer = { x: 0.5, y: 0.5 };
 window.addEventListener("pointermove", (e) => {
-  const x = e.clientX / window.innerWidth;
-  const y = e.clientY / window.innerHeight;
+  pointer.x = e.clientX / window.innerWidth;
+  pointer.y = e.clientY / window.innerHeight;
+});
 
+function updateUniform() {
   // shift everything back, insert new position at front
   trail.pop();
-  trail.unshift([x, y]);
+  trail.unshift([pointer.x, pointer.y]);
   device.queue.writeBuffer(
     uniformBuffer,
     0,
     new Float32Array(trail.flat().concat(canvas.width).concat(canvas.height)),
   );
-});
+}
 
 async function loadShader(path) {
   const res = await fetch(path);
@@ -112,6 +115,7 @@ function draw() {
 }
 
 function frame() {
+  updateUniform();
   draw();
   requestAnimationFrame(frame);
 }

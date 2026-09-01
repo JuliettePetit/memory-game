@@ -7,7 +7,8 @@
             type="module"
             src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"
         ></script>
-        <script src="game.js"></script>
+        <!-- <script src="game.js"></script> -->
+        <script src="script.js"></script>
         <script type="module" src="pointer.js"></script>
     </head>
     <body>
@@ -18,7 +19,9 @@
                 <button id="btn-restart">play again</button>
             </div>
         </div>
-        <div id="time-layout"></div>
+        <div id="time-layout">
+            <canvas id="timerCanvas" height="70"></canvas>
+        </div>
         <div id="chat-layout"></div>
         <div id="persona-layout">
             <model-viewer
@@ -115,16 +118,6 @@
         background: rebeccapurple;
     }
 
-    #time-layout {
-        background-image: url("res/img/layout/timelayout.png");
-        background-repeat: no-repeat;
-        background-size: contain;
-        width: 300px;
-        height: 300px;
-        padding: 20px;
-        padding-top: 30px
-    }
-
     #persona-layout {
         box-sizing: border-box;
         display: flex;
@@ -155,5 +148,23 @@
     will-change: transform;
     transform: translateZ(0); // ?
     z-index: 99999;
+    }
+
+    #time-layout {
+        background-image: url("res/img/layout/timelayout.png");
+        background-repeat: no-repeat;
+        background-size: contain;
+        width: 300px;
+        height: 110px;
+        padding: 10px;
+        padding-top: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #timerCanvas {
+        max-width: 100%;
+        max-height: 100%;
     }
 </style>
