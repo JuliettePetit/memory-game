@@ -30,7 +30,7 @@ context.configure({
 const TRAIL_LENGTH = 8;
 const uniformBuffer = device.createBuffer({
   label: "pointer position",
-  size: 80, // 64 (4×vec4f) + 8 (vec2f) = 72, padded up to nearest multiple of 16
+  size: 80, // 64 (4×vec4f) + 8 (vec2f) = 80, padded up to nearest multiple of 16
   usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
 });
 
