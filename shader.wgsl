@@ -10,6 +10,7 @@ fn vs_main(input: VertexInput) -> @builtin(position) vec4<f32> {
 struct Uniforms {
     cursors_pos: array<vec4f, 4>,
     resolution: vec2f,   // canvas.width, canvas.height in pixels
+    time: f32,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 
@@ -31,8 +32,8 @@ fn fragmentMain(@builtin(position) fragCoord: vec4f) -> @location(0) vec4f {
     let p = fragCoord.xy; // current pixel
 
     let noiseScale = 0.02;   // how zoomed in the noise pattern is
-    let wobbleStrength = 10.0;
-    let n = noise(p * noiseScale); // the noise value for this pixel (in [0,1])
+    let wobbleStrength = 15.0;
+    let n = noise(p * noiseScale + vec2f(u.time , 0.0)); // the noise value for this pixel (in [0,1])
     let wobble = (n - 0.5) * wobbleStrength; // center around 0, scale to pixels
 
     let pWarped = p + vec2f(wobble, wobble); // displaced sampling position

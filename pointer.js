@@ -46,10 +46,13 @@ function updateUniform() {
   // shift everything back, insert new position at front
   trail.pop();
   trail.unshift([pointer.x, pointer.y]);
+  const time = performance.now() / 1000;
   device.queue.writeBuffer(
     uniformBuffer,
     0,
-    new Float32Array(trail.flat().concat(canvas.width).concat(canvas.height)),
+    new Float32Array(
+      trail.flat().concat(canvas.width).concat(canvas.height).concat(time),
+    ),
   );
 }
 
